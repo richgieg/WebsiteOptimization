@@ -19,10 +19,32 @@ module.exports = function(grunt) {
       },
     },
 
+    // Ensure that the max image width is 720px and compress images
+    responsive_images: {
+      main: {
+        options: {
+          engine: 'im',
+          sizes: [{
+            width: '100%',
+            quality: 60,
+            rename: false
+          }]
+        },
+
+        files: [{
+          expand: true,
+          cwd: 'src',
+          src: ['**/*.{gif,jpg,png}'],
+          dest: 'dist'
+        }]
+      },
+    },
+
   });
 
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.registerTask('default', ['clean', 'copy']);
+  grunt.loadNpmTasks('grunt-responsive-images');
+  grunt.registerTask('default', ['clean', 'responsive_images']);
 
 };
