@@ -14,12 +14,12 @@ module.exports = function(grunt) {
       main: {
         expand: true,
         cwd: 'src',
-        src: '**/*',
+        src: '**/*.{css,html,js}',
         dest: 'dist',
       },
     },
 
-    // Ensure that the max image width is 720px and compress images
+    // Reduce image quality to save space
     responsive_images: {
       main: {
         options: {
@@ -45,6 +45,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-responsive-images');
-  grunt.registerTask('default', ['clean', 'responsive_images']);
+  grunt.registerTask('default', ['clean', 'copy', 'responsive_images']);
 
 };
