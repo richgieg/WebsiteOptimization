@@ -1,3 +1,14 @@
+/*
+*   Module:   Gruntfile.js
+*   Author:   Richard Gieg
+*
+*   This file contains Grunt task definitions that optimize the website's
+*   source code and images. Whenever the source code or images are modified,
+*   or if you haven't built the site for the first time yet, these jobs must
+*   be executed by running 'grunt' in the terminal.
+*
+*/
+
 module.exports = function(grunt) {
 
   grunt.initConfig({
