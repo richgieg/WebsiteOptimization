@@ -30,6 +30,8 @@ form {
 }
 
 .mover {
+  /* Request for sliding pizzas to have their own layers*/
+  will-change: transform;
   position: fixed;
   width: 256px;
   z-index: -1;

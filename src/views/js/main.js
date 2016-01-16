@@ -480,10 +480,6 @@ window.performance.measure("measure_pizza_generation", "mark_start_generating", 
 var timeToGenerate = window.performance.getEntriesByName("measure_pizza_generation");
 console.log("Time to generate pizzas on load: " + timeToGenerate[0].duration + "ms");
 
-// Iterator for number of times the pizzas in the background have scrolled.
-// Used by updatePositions() to decide when to log the average time per frame
-var frame = 0;
-
 // Logs the average amount of time per 10 frames needed to move the sliding background pizzas on scroll.
 function logAverageFrame(times) {   // times is the array of User Timing measurements from updatePositions()
   var numberOfEntries = times.length;
@@ -497,35 +493,34 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 // The following code for sliding background pizzas was pulled from Ilya's demo found at:
 // https://www.igvita.com/slides/2012/devtools-tips-and-tricks/jank-demo.html
 
-// Moves the sliding background pizzas based on scroll position
+// Moves the sliding background pizzas based on scroll position. This function
+// has been repurposed as a callback for the requestAnimationFrame API, as
+// opposed to being a scroll event handler. This ensures that scroll events
+// don't interrupt a frame already in progress. Also, it ensures that the code
+// runs at the earliest possible time in each frame, as decided by the browser.
 function updatePositions() {
-  frame++;
-  window.performance.mark("mark_start_frame");
-
   var items = document.querySelectorAll('.mover');
+  // Access the scrollTop property outside of the loop in order to avoid
+  // layout thrashing.
+  var scrollTopQuotient = document.body.scrollTop / 1250;
   for (var i = 0; i < items.length; i++) {
-    var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+    var phase = Math.sin((scrollTopQuotient) + (i % 5));
     items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
   }
-
-  // User Timing API to the rescue again. Seriously, it's worth learning.
-  // Super easy to create custom metrics.
-  window.performance.mark("mark_end_frame");
-  window.performance.measure("measure_frame_duration", "mark_start_frame", "mark_end_frame");
-  if (frame % 10 === 0) {
-    var timesToUpdatePosition = window.performance.getEntriesByName("measure_frame_duration");
-    logAverageFrame(timesToUpdatePosition);
-  }
+  // Queue this function to run at the beginning of the next frame
+  requestAnimationFrame(updatePositions);
 }
-
-// runs updatePositions on scroll
-window.addEventListener('scroll', updatePositions);
 
 // Generates the sliding pizzas when the page loads.
 document.addEventListener('DOMContentLoaded', function() {
+  // Create eight rows of sliding pizzas (8 * 8 = 64). Originally, the for loop
+  // was coded to create 200 sliding pizzas, which would be 25 rows, the bulk
+  // of which would not even be visible on the screen, thus unnecessary.
+  var rows = 8;
   var cols = 8;
   var s = 256;
-  for (var i = 0; i < 200; i++) {
+  var totalSlidingPizzas = rows * cols;
+  for (var i = 0; i < totalSlidingPizzas; i++) {
     var elem = document.createElement('img');
     elem.className = 'mover';
     elem.src = "images/pizza.png";
@@ -535,5 +530,7 @@ document.addEventListener('DOMContentLoaded', function() {
     elem.style.top = (Math.floor(i / cols) * s) + 'px';
     document.querySelector("#movingPizzas1").appendChild(elem);
   }
-  updatePositions();
+  // Start the animation loop by utilizing the requestAnimationFrame API,
+  // passing in the updatePositions() function
+  requestAnimationFrame(updatePositions);
 });
