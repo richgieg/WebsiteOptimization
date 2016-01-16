@@ -9,14 +9,32 @@ module.exports = function(grunt) {
       },
     },
 
-    // Copy src files to dist directory (HTML, CSS, JavaScript)
+    // Copy src files to dist directory (CSS, JavaScript)
     copy: {
       main: {
         expand: true,
         cwd: 'src',
-        src: '**/*.{css,html,js}',
+        src: '**/*.{css,js}',
         dest: 'dist',
       },
+    },
+
+    // Minify HTML files, including inline JavaScript and CSS
+    htmlmin: {
+       main: {
+          options: {
+              minifyJS: true,
+              minifyCSS: true,
+              removeComments: true,
+              collapseWhitespace: true
+          },
+          files: [{
+            expand: true,
+            cwd: 'src',
+            src: '**/*.html',
+            dest: 'dist',
+          }]
+       }
     },
 
     // Reduce image quality of src images to lower file size
@@ -30,7 +48,6 @@ module.exports = function(grunt) {
             rename: false
           }]
         },
-
         files: [{
           expand: true,
           cwd: 'src',
@@ -44,7 +61,9 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-htmlmin');
   grunt.loadNpmTasks('grunt-responsive-images');
-  grunt.registerTask('default', ['clean', 'copy', 'responsive_images']);
+  grunt.registerTask('default', [
+    'clean', 'copy', 'htmlmin', 'responsive_images']);
 
 };
