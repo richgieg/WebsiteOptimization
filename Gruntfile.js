@@ -9,7 +9,7 @@ module.exports = function(grunt) {
       },
     },
 
-    // Copy src files to dist directory
+    // Copy src files to dist directory (HTML, CSS, JavaScript)
     copy: {
       main: {
         expand: true,
@@ -19,7 +19,7 @@ module.exports = function(grunt) {
       },
     },
 
-    // Reduce image quality to save space
+    // Reduce image quality of src images to lower file size
     responsive_images: {
       main: {
         options: {
